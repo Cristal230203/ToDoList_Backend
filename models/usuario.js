@@ -17,7 +17,8 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
-    minlength: 6
+    minlength: 6,
+    select: false  // ← AGREGAR ESTO: no devolver password por defecto
   }
 }, {
   timestamps: true
