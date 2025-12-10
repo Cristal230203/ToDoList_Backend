@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
-const User = require('../models/usuario'); // ← Cambiado a 'usuario'
+const User = require('../models/usuario');
 
 // Generar JWT Token
 const generateToken = (userId) => {
@@ -13,10 +13,10 @@ const generateToken = (userId) => {
 // POST /api/auth/register - Registrar nuevo usuario
 router.post('/register', async (req, res) => {
   try {
-    const { username, email, password } = req.body; // ← Cambiado 'name' a 'username'
+    const { username, email, password } = req.body; // ← CORREGIDO
 
     // Validar campos
-    if (!username || !email || !password) {
+    if (!username || !email || !password) { // ← CORREGIDO
       return res.status(400).json({ 
         error: 'Por favor proporciona nombre de usuario, email y contraseña' 
       });
@@ -32,7 +32,7 @@ router.post('/register', async (req, res) => {
 
     // Crear usuario
     const user = await User.create({
-      username, // ← Cambiado de 'name'
+      username, // ← CORREGIDO
       email,
       password
     });
@@ -45,7 +45,7 @@ router.post('/register', async (req, res) => {
       token,
       user: {
         id: user._id,
-        username: user.username, // ← Cambiado de 'name'
+        username: user.username, // ← CORREGIDO
         email: user.email
       }
     });
@@ -93,7 +93,7 @@ router.post('/login', async (req, res) => {
       token,
       user: {
         id: user._id,
-        username: user.username, // ← Cambiado de 'name'
+        username: user.username, // ← CORREGIDO
         email: user.email
       }
     });
@@ -124,7 +124,7 @@ router.get('/me', async (req, res) => {
       success: true,
       user: {
         id: user._id,
-        username: user.username, // ← Cambiado de 'name'
+        username: user.username, // ← CORREGIDO
         email: user.email
       }
     });
