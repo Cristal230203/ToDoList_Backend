@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const User = require('../models/usuario');
 
 const protect = async (req, res, next) => {
   try {
@@ -12,31 +12,39 @@ const protect = async (req, res, next) => {
 
     // Verificar si existe el token
     if (!token) {
-      return res.status(401).json({ 
-        error: 'No autorizado. Token no proporcionado.' 
+      return res.status(401).json({
+        error: 'No autorizado. Token no proporcionado.'
       });
     }
 
     // Verificar token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    // Agregar usuario a la request
-    req.user = await User.findById(decoded.id).select('-password');
+    // Soportar distintos nombres de payload: preferir userId, luego id
+    const userId = decoded.userId || decoded.id || decoded._id;
+
+    if (!userId) {
+      return res.status(401).json({ error: 'Token inválido: usuario no especificado.' });
+    }
+
+    // Agregar usuario y userId a la request para compatibilidad
+    req.userId = userId;
+    req.user = await User.findById(userId).select('-password');
 
     if (!req.user) {
-      return res.status(401).json({ 
-        error: 'Usuario no encontrado.' 
+      return res.status(401).json({
+        error: 'Usuario no encontrado.'
       });
     }
 
     next();
   } catch (error) {
     console.error('Error de autenticación:', error);
-    
+
     if (error.name === 'JsonWebTokenError') {
       return res.status(401).json({ error: 'Token inválido.' });
     }
-    
+
     if (error.name === 'TokenExpiredError') {
       return res.status(401).json({ error: 'Token expirado.' });
     }
@@ -45,4 +53,4 @@ const protect = async (req, res, next) => {
   }
 };
 
-module.exports = { protect };
+module.exports = protect;
