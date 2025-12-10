@@ -18,16 +18,31 @@ router.post('/register', async (req, res) => {
     const user = new User({ username, email, password });
     await user.save();
 
+    // ⭐ AGREGAR ESTO: Generar token también en el registro
+    const token = jwt.sign(
+      { userId: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    // ⭐ CAMBIAR LA RESPUESTA para incluir token y user
     res.status(201).json({ 
       success: true,
-      message: 'Usuario registrado exitosamente' 
+      message: 'Usuario registrado exitosamente',
+      token,  // ← Agregar token
+      user: {  // ← Agregar datos del usuario
+        id: user._id,
+        username: user.username,
+        email: user.email
+      }
     });
   } catch (error) {
+    console.error('Error en registro:', error);
     res.status(500).json({ error: 'Error al registrar usuario' });
   }
 });
 
-// Login
+// Login (este ya está bien, no cambiar)
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -61,6 +76,7 @@ router.post('/login', async (req, res) => {
       }
     });
   } catch (error) {
+    console.error('Error en login:', error);
     res.status(500).json({ error: 'Error al iniciar sesión' });
   }
 });
