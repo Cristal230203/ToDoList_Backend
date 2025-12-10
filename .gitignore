@@ -1,0 +1,69 @@
+# Dependencias
+node_modules/
+*/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# Variables de entorno
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+*.env
+
+# Logs
+logs/
+*.log
+
+# Build frontend
+frontend/build/
+frontend/dist/
+client/build/
+client/dist/
+
+# Build backend
+backend/build/
+backend/dist/
+
+# Testing
+coverage/
+.nyc_output/
+*.lcov
+
+# Archivos del sistema operativo
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Archivos de IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+*~
+
+# Archivos temporales
+*.tmp
+*.temp
+tmp/
+temp/
+
+# Cache
+.cache/
+.parcel-cache/
+.next/
+.nuxt/
+
+# Archivos de producción
+*.tgz
+*.gz
