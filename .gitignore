@@ -67,3 +67,10 @@ temp/
 # Archivos de producción
 *.tgz
 *.gz
+
+node_modules/
+.env
+.DS_Store
+*.log
+npm-debug.log*
+.vscode/

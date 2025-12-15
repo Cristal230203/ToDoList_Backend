@@ -1,67 +1,135 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
-const User = require('../models/usuario');
+const User = require('../models/User');
 
-// Registro
+// Generar JWT Token
+const generateToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRES_IN || '30d'
+  });
+};
+
+// POST /api/auth/register - Registrar nuevo usuario
 router.post('/register', async (req, res) => {
   try {
-    const { username, email, password } = req.body;
+    const { name, email, password } = req.body;
 
-    // Validar que el usuario no exista
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ error: 'El email ya está registrado' });
+    // Validar campos
+    if (!name || !email || !password) {
+      return res.status(400).json({ 
+        error: 'Por favor proporciona nombre, email y contraseña' 
+      });
+    }
+
+    // Verificar si el usuario ya existe
+    const userExists = await User.findOne({ email });
+    if (userExists) {
+      return res.status(400).json({ 
+        error: 'El email ya está registrado' 
+      });
     }
 
     // Crear usuario
-    const user = new User({ username, email, password });
-    await user.save();
+    const user = await User.create({
+      name,
+      email,
+      password
+    });
 
-    res.status(201).json({ 
+    // Generar token
+    const token = generateToken(user._id);
+
+    res.status(201).json({
       success: true,
-      message: 'Usuario registrado exitosamente' 
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email
+      }
     });
   } catch (error) {
+    console.error('Error al registrar usuario:', error);
     res.status(500).json({ error: 'Error al registrar usuario' });
   }
 });
 
-// Login
+// POST /api/auth/login - Iniciar sesión
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Buscar usuario
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(401).json({ error: 'Credenciales inválidas' });
+    // Validar campos
+    if (!email || !password) {
+      return res.status(400).json({ 
+        error: 'Por favor proporciona email y contraseña' 
+      });
     }
 
-    // Verificar password
-    const isMatch = await user.comparePassword(password);
-    if (!isMatch) {
-      return res.status(401).json({ error: 'Credenciales inválidas' });
+    // Buscar usuario (incluir password para comparar)
+    const user = await User.findOne({ email }).select('+password');
+
+    if (!user) {
+      return res.status(401).json({ 
+        error: 'Credenciales inválidas' 
+      });
+    }
+
+    // Verificar contraseña
+    const isPasswordValid = await user.comparePassword(password);
+
+    if (!isPasswordValid) {
+      return res.status(401).json({ 
+        error: 'Credenciales inválidas' 
+      });
     }
 
     // Generar token
-    const token = jwt.sign(
-      { userId: user._id },
-      process.env.JWT_SECRET,
-      { expiresIn: '7d' }
-    );
+    const token = generateToken(user._id);
 
     res.json({
       success: true,
       token,
       user: {
         id: user._id,
-        username: user.username,
+        name: user.name,
         email: user.email
       }
     });
   } catch (error) {
+    console.error('Error al iniciar sesión:', error);
     res.status(500).json({ error: 'Error al iniciar sesión' });
+  }
+});
+
+// GET /api/auth/me - Obtener usuario autenticado
+router.get('/me', async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    
+    if (!token) {
+      return res.status(401).json({ error: 'No autorizado' });
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id).select('-password');
+
+    if (!user) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+
+    res.json({
+      success: true,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email
+      }
+    });
+  } catch (error) {
+    console.error('Error al obtener usuario:', error);
+    res.status(401).json({ error: 'No autorizado' });
   }
 });
 

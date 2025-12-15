@@ -8,9 +8,9 @@ const app = express();
 // Conectar a MongoDB
 connectDB();
 
-// Middlewares
+// ⚠️ IMPORTANTE: Middlewares ANTES de las rutas
 app.use(cors());
-app.use(express.json());
+app.use(express.json()); // 👈 ESTO ES CRÍTICO
 
 // Rutas
 app.use('/api/auth', require('./routes/auth'));
@@ -22,6 +22,6 @@ app.get('/', (req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
 });
