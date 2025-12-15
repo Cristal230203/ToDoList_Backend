@@ -4,8 +4,13 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
 // Generar JWT Token
+<<<<<<< HEAD
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
+=======
+const generateToken = (userId) => {
+  return jwt.sign({ userId }, process.env.JWT_SECRET, {
+>>>>>>> 8877c44b6f9595ef8c876a79ff02b7f3cf726079
     expiresIn: process.env.JWT_EXPIRES_IN || '30d'
   });
 };
@@ -13,12 +18,21 @@ const generateToken = (id) => {
 // POST /api/auth/register - Registrar nuevo usuario
 router.post('/register', async (req, res) => {
   try {
+<<<<<<< HEAD
     const { name, email, password } = req.body;
 
     // Validar campos
     if (!name || !email || !password) {
       return res.status(400).json({ 
         error: 'Por favor proporciona nombre, email y contraseña' 
+=======
+    const { username, email, password } = req.body; // ← CORREGIDO
+
+    // Validar campos
+    if (!username || !email || !password) { // ← CORREGIDO
+      return res.status(400).json({ 
+        error: 'Por favor proporciona nombre de usuario, email y contraseña' 
+>>>>>>> 8877c44b6f9595ef8c876a79ff02b7f3cf726079
       });
     }
 
@@ -32,7 +46,11 @@ router.post('/register', async (req, res) => {
 
     // Crear usuario
     const user = await User.create({
+<<<<<<< HEAD
       name,
+=======
+      username, // ← CORREGIDO
+>>>>>>> 8877c44b6f9595ef8c876a79ff02b7f3cf726079
       email,
       password
     });
@@ -45,7 +63,11 @@ router.post('/register', async (req, res) => {
       token,
       user: {
         id: user._id,
+<<<<<<< HEAD
         name: user.name,
+=======
+        username: user.username, // ← CORREGIDO
+>>>>>>> 8877c44b6f9595ef8c876a79ff02b7f3cf726079
         email: user.email
       }
     });
@@ -93,7 +115,11 @@ router.post('/login', async (req, res) => {
       token,
       user: {
         id: user._id,
+<<<<<<< HEAD
         name: user.name,
+=======
+        username: user.username, // ← CORREGIDO
+>>>>>>> 8877c44b6f9595ef8c876a79ff02b7f3cf726079
         email: user.email
       }
     });
@@ -113,7 +139,12 @@ router.get('/me', async (req, res) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+<<<<<<< HEAD
     const user = await User.findById(decoded.id).select('-password');
+=======
+    const userId = decoded.userId || decoded.id;
+    const user = await User.findById(userId).select('-password');
+>>>>>>> 8877c44b6f9595ef8c876a79ff02b7f3cf726079
 
     if (!user) {
       return res.status(404).json({ error: 'Usuario no encontrado' });
@@ -123,7 +154,11 @@ router.get('/me', async (req, res) => {
       success: true,
       user: {
         id: user._id,
+<<<<<<< HEAD
         name: user.name,
+=======
+        username: user.username, // ← CORREGIDO
+>>>>>>> 8877c44b6f9595ef8c876a79ff02b7f3cf726079
         email: user.email
       }
     });

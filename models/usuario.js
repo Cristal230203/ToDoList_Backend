@@ -16,8 +16,14 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
+<<<<<<< HEAD
     required: [true, 'La contraseña es requerida'],
     minlength: 6
+=======
+    required: true,
+    minlength: 6,
+    select: false  // ← AGREGAR ESTO: no devolver password por defecto
+>>>>>>> 8877c44b6f9595ef8c876a79ff02b7f3cf726079
   }
 }, {
   timestamps: true
