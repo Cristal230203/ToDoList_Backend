@@ -13,7 +13,7 @@ app.use(cors());
 app.use(express.json()); // 👈 ESTO ES CRÍTICO
 
 // Rutas
-app.use('/api/auth', require('./routes/auth'));
+app.use('/api/auth', require('./routes/authrutas'));
 app.use('/api/todos', require('./routes/todos'));
 
 // Ruta de prueba
